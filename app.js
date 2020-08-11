@@ -1,6 +1,9 @@
-const channelName = 'armadwarf'
+const channelName = 'sashagrey'
 const rootElement = document.getElementById('root');
+const card_remove_timeout = 8000;
 
+
+let chatList = [];
 
 const client = new tmi.Client({
 	connection: {
@@ -13,9 +16,12 @@ const client = new tmi.Client({
 client.connect();
 
 client.on('message', (channel, tags, message, self) => {
-	// "Alca: Hello, World!"
-    console.log(tags);
-    console.log(new Date());
+    // "Alca: Hello, World!"
+    const randomColor = "#"+(
+        pick = (s, c) => {
+            return  s[Math.floor(Math.random() * s.length)] + (c && pick(s, c - 1));
+    })('56789ABCDEF', 4);
+
     tags['color'] = true;
     const cardElement = document.createElement('div');
     cardElement.className = 'card';
@@ -23,7 +29,7 @@ client.on('message', (channel, tags, message, self) => {
     const cardTitle = document.createElement('div');
     cardTitle.className = 'card-header';
     cardTitle.innerHTML = `${tags['display-name']}`;
-    cardTitle.style.color = randomColor();
+    cardTitle.style.color = randomColor;
     
     const cardBody = document.createElement('div');
     cardBody.className = 'card-body';
@@ -42,13 +48,27 @@ client.on('message', (channel, tags, message, self) => {
     cardBody.appendChild(messageContainer);
     messageContainer.appendChild(messageElement);
     messageContainer.appendChild(messageTime);
-    rootElement.appendChild(cardElement);
 
+
+    
+    setTimeout(()=>{
+        removeCard(rootElement, cardElement);
+    }, card_remove_timeout);
+    addCard(rootElement, cardElement);
 });
 
 
-
-randomColor = () => {
-    return `#${Math.floor(Math.random() * 255).toString(16)}${Math.floor(Math.random() * 255).toString(16)}${Math.floor(Math.random() * 255).toString(16)}`
+removeCard = (parent, nested) => { 
+    nested.style.transition = 'all 0.4s ease-in-out';
+    nested.style.opacity = 0;  
+    setTimeout(()=>{
+        chatList.splice(chatList.indexOf(nested), 1);
+        parent.removeChild(nested);
+    },450);
 }
+addCard = (parent, nested) => {
+    parent.insertBefore(nested, parent.firstChild);
+    chatList.push(nested);
+}
+
 		
